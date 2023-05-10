@@ -1,11 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import { StyleSheet, View, TextInput } from 'react-native';
-import { Icon, Button } from '@rneui/themed';
+import { Icon, Button, Dialog, Text} from '@rneui/themed';
 import useForm from '../hooks/useForm';
 import postUsuario from '../backend/postUsuario';
 import deleteUsuario from '../backend/deleteUsuario';
 
 export default function Users({ route, navigation }) {
+  const [visible2, setVisible2] = useState(false);
+
   const { name, lastName, id, postForm } = route.params;
 
   const { userState, handleChange } = useForm(name, lastName, id);
@@ -22,8 +24,23 @@ export default function Users({ route, navigation }) {
     navigation.goBack()
   };
 
+  const toggleDialog2 = () => {
+    setVisible2(!visible2);
+  };
+
   return (
     <View style={styles.container}>
+      <Dialog
+        isVisible={visible2}
+        onBackdropPress={toggleDialog2}
+      >
+        <Dialog.Title title="¿Estás seguro?" />
+        <Text>Los datos serán borrados permanentemente</Text>
+        <Dialog.Actions>
+          <Dialog.Button title="Borrar" onPress={() => borrarUsuario()} />
+        </Dialog.Actions>
+      </Dialog>
+
       <TextInput
         key={'name'}
         style={styles.input}
@@ -52,7 +69,7 @@ export default function Users({ route, navigation }) {
               <Icon name="save" color="white" />
             </Button>
 
-            <Button onPress={borrarUsuario} style={styles.button} radius={'sm'} type="solid">
+            <Button onPress={toggleDialog2} style={styles.button} radius={'sm'} type="solid">
               Delete
               <Icon name="delete" color="white" />
             </Button>
