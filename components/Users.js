@@ -1,17 +1,30 @@
-import { StyleSheet, View, ScrollView, TouchableHighlight} from 'react-native';
+import { useEffect } from 'react';
+import { StyleSheet, View, ScrollView, TouchableHighlight } from 'react-native';
+import { useIsFocused } from "@react-navigation/native";
 import { ListItem, Icon, Button } from '@rneui/themed';
 import data from '../data.json';
 
+import useGetData from '../backend/getUsuarios2';
+
 export default function Users({ navigation }) {
+    const isFocused = useIsFocused();
+    const { users, getData } = useGetData()
+
+    useEffect(() => {
+        if (isFocused) {
+            getData()
+        }
+    }, [isFocused])
+
     return (
         <View style={styles.container}>
             <ScrollView style={styles.scrollView}>
                 {
-                    data.map(({ name, lastName }, ix) => (
+                    (users || data).map(({ name, lastName, id }, ix) => (
                         <ListItem
                             key={ix}
                             Component={TouchableHighlight}
-                            onPress={() => navigation.navigate('Users', { name, lastName })}
+                            onPress={() => navigation.navigate('Users', { name, lastName,id })}
                             leftWidth={80}
                             rightWidth={90}
                             minSlideWidth={40}
@@ -39,7 +52,8 @@ export default function Users({ navigation }) {
                 }
             </ScrollView>
             <Button
-                title="Go to Jane's profile"
+                title="Agregar Usuario"
+                onPress={() => navigation.navigate('Users', { postForm: true })}
             />
         </View>
     );
